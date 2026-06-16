@@ -1,0 +1,13 @@
+<Window x:Class="WorkSpaceLauncherPro.App.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Settings" Height="500" Width="700"
+        Background="{StaticResource BackgroundBrush}"
+        Foreground="{StaticResource TextPrimaryBrush}"
+        FontFamily="{StaticResource UiFontFamily}">
+    <Grid Margin="20">
+        <TextBlock Style="{StaticResource HeadingText}" Text="Settings" />
+        <TextBlock Style="{StaticResource SubtitleText}" Margin="0,8,0,0"
+                   Text="Startup, hotkeys, theme — wired in M5." />
+    </Grid>
+</Window>

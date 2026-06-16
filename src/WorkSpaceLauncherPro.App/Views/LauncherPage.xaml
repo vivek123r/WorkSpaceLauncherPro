@@ -1,0 +1,38 @@
+<UserControl x:Class="WorkSpaceLauncherPro.App.Views.LauncherPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:WorkSpaceLauncherPro.App.ViewModels"
+             xmlns:views="clr-namespace:WorkSpaceLauncherPro.App.Views"
+             xmlns:controls="clr-namespace:WorkSpaceLauncherPro.App.Views.Controls"
+             d:DataContext="{d:DesignInstance Type=vm:ShellViewModel}"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,16">
+            <TextBlock Style="{StaticResource HeadingText}" Text="What are we doing today?" />
+            <TextBlock Style="{StaticResource SubtitleText}" Margin="0,4,0,0"
+                       Text="Choose a workspace to launch, or open the visual designer." />
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Profiles}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:ProfileCardViewModel}">
+                        <controls:ProfileCard Margin="0,0,12,12" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

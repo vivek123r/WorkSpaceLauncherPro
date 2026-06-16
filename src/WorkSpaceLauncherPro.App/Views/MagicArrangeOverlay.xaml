@@ -1,0 +1,11 @@
+<Window x:Class="WorkSpaceLauncherPro.App.Views.MagicArrangeOverlay"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        Topmost="True" ShowInTaskbar="False" ResizeMode="NoResize"
+        Height="600" Width="900">
+    <Border Background="#CC0F0F11" BorderBrush="{StaticResource AccentBrush}" BorderThickness="1" CornerRadius="8">
+        <TextBlock Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"
+                   Text="Magic Arrange — drag windows to swap. ESC to close." />
+    </Border>
+</Window>

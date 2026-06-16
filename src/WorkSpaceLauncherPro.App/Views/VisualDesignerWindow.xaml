@@ -1,0 +1,17 @@
+<Window x:Class="WorkSpaceLauncherPro.App.Views.VisualDesignerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Visual Workspace Designer" Height="720" Width="1100"
+        Background="{StaticResource BackgroundBrush}"
+        Foreground="{StaticResource TextPrimaryBrush}"
+        FontFamily="{StaticResource UiFontFamily}">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Style="{StaticResource HeadingText}" Text="Visual Workspace Designer" />
+        <TextBlock Grid.Row="1" Style="{StaticResource SubtitleText}" Margin="0,12,0,0"
+                   Text="Designer canvas placeholder. Full designer comes in M6." />
+    </Grid>
+</Window>
