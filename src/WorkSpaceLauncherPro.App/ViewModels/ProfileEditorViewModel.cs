@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using WorkSpaceLauncherPro.Core.Models;
 using WorkSpaceLauncherPro.Data.Repositories;
+using WorkSpaceLauncherPro.App.Views;
 using MediaColor = System.Windows.Media.Color;
 
 namespace WorkSpaceLauncherPro.App.ViewModels;
@@ -210,6 +211,35 @@ public sealed partial class ProfileEditorViewModel : ObservableObject
         NewAppTarget = "";
         NewAppArgs = null;
         StatusText = "App added.";
+    }
+
+    /// <summary>
+    /// Opens the App Picker dialog and, on success, adds the chosen app to the profile.
+    /// This is the user-friendly way to add apps — no need to know AUMIDs or paths.
+    /// </summary>
+    public void AddPickedApp(PickedApp picked)
+    {
+        AppTargetKind kind = picked.Source switch
+        {
+            Core.Launching.AppSourceKind.Uwp     => AppTargetKind.Aumid,
+            Core.Launching.AppSourceKind.Win32   => AppTargetKind.Executable,
+            Core.Launching.AppSourceKind.Browser => AppTargetKind.BrowserProfile,
+            Core.Launching.AppSourceKind.Url     => AppTargetKind.Url,
+            Core.Launching.AppSourceKind.Folder  => AppTargetKind.ShellFolder,
+            _ => AppTargetKind.Executable
+        };
+        var app = new ProfileApp
+        {
+            DisplayName = picked.DisplayName,
+            Kind = kind,
+            Target = picked.Target,
+            LaunchArgs = picked.LaunchArgs,
+            BrowserProfileDir = picked.Source == Core.Launching.AppSourceKind.Browser ? "Default" : null,
+            SortIndex = Apps.Count
+        };
+        _profile.Apps.Add(app);
+        Apps.Add(new AppRowViewModel(app));
+        StatusText = $"Added {picked.DisplayName}";
     }
 
     [RelayCommand]

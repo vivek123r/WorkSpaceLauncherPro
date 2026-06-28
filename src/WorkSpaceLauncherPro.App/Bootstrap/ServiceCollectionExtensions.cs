@@ -84,6 +84,8 @@ public static class ServiceCollectionExtensions
         services.AddTransient<MagicArrangeOverlay>();
         services.AddTransient<SettingsWindow>();
         services.AddTransient<ImportWindow>();
+        services.AddTransient<AppPickerWindow>();
+        services.AddTransient<AppPickerViewModel>();
 
         return services;
     }

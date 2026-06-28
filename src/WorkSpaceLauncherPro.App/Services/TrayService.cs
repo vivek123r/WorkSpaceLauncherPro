@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using WorkSpaceLauncherPro.App.ViewModels;
 using WorkSpaceLauncherPro.Data.Repositories;
 
 namespace WorkSpaceLauncherPro.App.Services;
@@ -92,10 +93,49 @@ public sealed class TrayService : ITrayService
         }
 
         _menu.Items.Add(new ToolStripSeparator());
+        var manageItem = new ToolStripMenuItem("Manage");
+        manageItem.DropDownItems.Add("Delete all profiles…", null, (_, _) => DeleteAllProfiles());
+        _menu.Items.Add(manageItem);
+        _menu.Items.Add(new ToolStripSeparator());
         _menu.Items.Add("Quit", null, (_, _) =>
         {
             if (Application.Current is not null) Application.Current.Shutdown();
         });
+    }
+
+    private void DeleteAllProfiles()
+    {
+        if (Application.Current?.Dispatcher is { } d && !d.CheckAccess())
+        {
+            d.Invoke(DeleteAllProfiles);
+            return;
+        }
+        var result = MessageBox.Show(
+            "Delete ALL profiles? This cannot be undone.",
+            "WorkSpace Launcher Pro",
+            MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No);
+        if (result != MessageBoxResult.Yes) return;
+
+        try
+        {
+            var all = _repo.GetAllAsync().GetAwaiter().GetResult();
+            foreach (var p in all)
+            {
+                _repo.DeleteAsync(p.Id).GetAwaiter().GetResult();
+            }
+            // Tell the shell to reload
+            if (Application.Current?.MainWindow?.DataContext is ShellViewModel shell)
+            {
+                _ = shell.LoadAsync();
+            }
+            _log.LogInformation("Deleted {Count} profile(s) from tray", all.Count);
+        }
+        catch (Exception ex)
+        {
+            _log.LogError(ex, "Delete all from tray failed");
+            MessageBox.Show($"Delete failed: {ex.Message}", "WorkSpace Launcher Pro",
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     private void ShowShell()

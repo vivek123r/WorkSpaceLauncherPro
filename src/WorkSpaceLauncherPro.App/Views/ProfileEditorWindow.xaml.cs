@@ -1,4 +1,5 @@
 using System.Windows;
+using Microsoft.Extensions.DependencyInjection;
 using WorkSpaceLauncherPro.App.ViewModels;
 
 namespace WorkSpaceLauncherPro.App.Views;
@@ -16,7 +17,6 @@ public partial class ProfileEditorWindow : Window
                 await vm.SaveCommand.ExecuteAsync(null);
                 if (vm.StatusText.StartsWith("Save failed", StringComparison.Ordinal))
                 {
-                    // Don't close; show error
                     return;
                 }
                 DialogResult = true;
@@ -33,5 +33,13 @@ public partial class ProfileEditorWindow : Window
     {
         DialogResult = false;
         Close();
+    }
+
+    private void OnOpenAppPicker(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not ProfileEditorViewModel vm) return;
+        var picker = App.Services.GetRequiredService<AppPickerWindow>();
+        if (picker.ShowDialog() == true && picker.Result is { } picked)
+            vm.AddPickedApp(picked);
     }
 }

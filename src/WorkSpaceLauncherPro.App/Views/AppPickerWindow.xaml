@@ -1,0 +1,183 @@
+<Window x:Class="WorkSpaceLauncherPro.App.Views.AppPickerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:WorkSpaceLauncherPro.App.ViewModels"
+        xmlns:core="clr-namespace:WorkSpaceLauncherPro.Core.Launching;assembly=WorkSpaceLauncherPro.Core"
+        Title="Add Application" Height="640" Width="860"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BackgroundBrush}"
+        Foreground="{StaticResource TextPrimaryBrush}"
+        FontFamily="{StaticResource UiFontFamily}">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0">
+            <TextBlock Style="{StaticResource HeadingText}" Text="Add an Application" />
+            <TextBlock Style="{StaticResource SubtitleText}" Margin="0,4,0,0"
+                       Text="Pick a tab, search or paste, then press Add." />
+        </StackPanel>
+
+        <!-- Type tabs (rendered as a TabControl for reliability) -->
+        <TabControl Grid.Row="1" Margin="0,12,0,0"
+                    Background="Transparent" BorderThickness="0"
+                    SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
+            <TabItem Header="All" />
+            <TabItem Header="Win32" />
+            <TabItem Header="UWP" />
+            <TabItem Header="Browser" />
+            <TabItem Header="URL" />
+            <TabItem Header="Folder" />
+        </TabControl>
+
+        <!-- Search box + status row -->
+        <Grid Grid.Row="2" Margin="0,8,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBlock Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center"
+                       Style="{StaticResource SubtitleText}" Text="{Binding StatusText}" />
+        </Grid>
+
+        <!-- Content area: one panel visible at a time, controlled by SelectedTabIndex -->
+        <Border Grid.Row="3" Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="6">
+            <Grid>
+                <!-- TAB 0/1/2: App list (All, Win32, UWP) -->
+                <ListBox x:Name="AppsList"
+                         ItemsSource="{Binding FilteredApps}"
+                         SelectedItem="{Binding SelectedApp}"
+                         Background="Transparent" BorderThickness="0"
+                         MouseDoubleClick="OnAppDoubleClick">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type core:InstalledApp}">
+                            <Grid Margin="4,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="40" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Width="28" Height="28" CornerRadius="4"
+                                        Background="{StaticResource SurfaceElevatedBrush}"
+                                        HorizontalAlignment="Left" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Source}" FontSize="10"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" />
+                                    <TextBlock Text="{Binding AumId}" Opacity="0.55" FontSize="11"
+                                               TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                                <TextBlock Grid.Column="2" Text="{Binding Source}" Opacity="0.5"
+                                           FontSize="11" VerticalAlignment="Center" Margin="8,0,8,0" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <!-- TAB 3: Browser -->
+                <ListBox x:Name="BrowserList"
+                         ItemsSource="{Binding FilteredBrowsers}"
+                         SelectedItem="{Binding SelectedBrowser}"
+                         Background="Transparent" BorderThickness="0"
+                         MouseDoubleClick="OnAppDoubleClick"
+                         Visibility="{Binding IsBrowserTab, Converter={StaticResource BoolToVis}}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:BrowserEntry}">
+                            <Grid Margin="4,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="40" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="🌐" FontSize="22" VerticalAlignment="Center" />
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" />
+                                    <TextBlock Text="{Binding DefaultExePath}" Opacity="0.55" FontSize="11"
+                                               TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <!-- TAB 4: URL -->
+                <Grid Visibility="{Binding IsUrlTab, Converter={StaticResource BoolToVis}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Style="{StaticResource SubtitleText}" Margin="16,16,16,4" Text="Enter a URL" />
+                    <TextBox   Grid.Row="1" Margin="16,0,16,8" Text="{Binding NewUrl, UpdateSourceTrigger=PropertyChanged}" FontSize="14" />
+                    <StackPanel Grid.Row="2" Margin="16,8,16,0">
+                        <TextBlock Style="{StaticResource SubtitleText}" Text="Quick picks" Margin="0,0,0,4" />
+                        <ItemsControl ItemsSource="{Binding UrlSuggestions}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Style="{StaticResource GhostButton}" Margin="0,0,6,6" Padding="8,3"
+                                            Content="{Binding}"
+                                            Click="OnUrlSuggestionClick" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Grid>
+
+                <!-- TAB 5: Folder -->
+                <Grid Visibility="{Binding IsFolderTab, Converter={StaticResource BoolToVis}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Style="{StaticResource SubtitleText}" Margin="16,16,16,4" Text="Folder path" />
+                    <Grid Grid.Row="1" Margin="16,0,16,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Text="{Binding NewFolder, UpdateSourceTrigger=PropertyChanged}" FontSize="14" />
+                        <Button Grid.Column="1" Style="{StaticResource GhostButton}" Content="📁 Browse"
+                                Margin="6,0,0,0" Click="OnBrowseFolderClick" />
+                    </Grid>
+                    <StackPanel Grid.Row="2" Margin="16,8,16,0">
+                        <TextBlock Style="{StaticResource SubtitleText}" Text="Quick picks" Margin="0,0,0,4" />
+                        <ItemsControl ItemsSource="{Binding FolderSuggestions}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Style="{StaticResource GhostButton}" Margin="0,0,6,6" Padding="8,3"
+                                            Content="{Binding}"
+                                            Click="OnFolderSuggestionClick" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- Footer -->
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button Style="{StaticResource GhostButton}" Content="Cancel" Click="OnCancelClick" Margin="0,0,8,0" />
+            <Button Style="{StaticResource PrimaryButton}" Content="Add" Click="OnAddClick" />
+        </StackPanel>
+    </Grid>
+</Window>
